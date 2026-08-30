@@ -1,0 +1,70 @@
+name: Контент
+
+# index.json лежит в корне и не попадает ни под один из путей ниже —
+# поэтому коммит индекса от бота не запускает workflow повторно.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'recipes/**'
+      - 'schema/**'
+      - 'packages/recipe-core/**'
+      - '.github/workflows/content.yml'
+  pull_request:
+    paths:
+      - 'recipes/**'
+      - 'schema/**'
+      - 'packages/recipe-core/**'
+  workflow_dispatch:
+
+# Два быстрых пуша подряд иначе подерутся при push индекса.
+concurrency:
+  group: content-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Тесты recipe-core
+        run: npm test
+
+      - name: Типы
+        run: npx tsc --noEmit
+
+      - name: Валидация рецептов
+        run: npm run content:check
+        env:
+          # Личные имена: список в публичном репозитории раскрывал бы то,
+          # что должен скрывать. Секрет может отсутствовать — тогда проверяются
+          # только обезличенные медицинские термины.
+          RECIPES_STOPWORDS: ${{ secrets.RECIPES_STOPWORDS }}
+
+      - name: Сборка индекса
+        if: github.event_name != 'pull_request'
+        run: npm run content:index
+
+      - name: Коммит индекса
+        if: github.event_name != 'pull_request'
+        run: |
+          if [[ -z "$(git status --porcelain index.json)" ]]; then
+            echo "index.json не изменился"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.json
+          git commit -m "chore: пересобран index.json"
+          git push

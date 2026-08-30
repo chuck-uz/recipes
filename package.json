@@ -1,0 +1,11 @@
+{
+  "name": "recipes",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "npm -w @recipes/core run test",
+    "content:check": "npm -w @recipes/core run content:check",
+    "content:index": "npm -w @recipes/core run content:index"
+  }
+}

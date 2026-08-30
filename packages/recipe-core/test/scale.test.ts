@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { scaleIngredient, type Ingredient } from '../src/index.js'
+import { scaleIngredient, type Ingredient } from '../src/index'
 
 const ing = (over: Partial<Ingredient>): Ingredient => ({
   id: 'x', name: 'тест', amount: 1, unit: 'g', ...over,

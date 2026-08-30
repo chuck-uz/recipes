@@ -4,9 +4,9 @@
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { extraStopWordsFromEnv } from '../stopwords.js'
-import { validateRecipe } from '../validate.js'
-import { recipesDir } from './paths.js'
+import { extraStopWordsFromEnv } from '../stopwords'
+import { validateRecipe } from '../validate'
+import { recipesDir } from './paths'
 
 const dir = fileURLToPath(recipesDir)
 const files = readdirSync(dir).filter((f) => f.endsWith('.json')).sort()

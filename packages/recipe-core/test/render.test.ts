@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { renderRecipe, type Recipe } from '../src/index.js'
+import { renderRecipe, type Recipe } from '../src/index'
 
 const recipe: Recipe = {
   schemaVersion: 1,

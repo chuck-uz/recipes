@@ -2,9 +2,9 @@ import Ajv2020 from 'ajv/dist/2020.js'
 import type { ErrorObject } from 'ajv'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { PLACEHOLDER } from './render.js'
-import { findStopWords } from './stopwords.js'
-import { SUPPORTED_SCHEMA_VERSION, type Recipe } from './types.js'
+import { PLACEHOLDER } from './render'
+import { findStopWords } from './stopwords'
+import { SUPPORTED_SCHEMA_VERSION, type Recipe } from './types'
 
 const schemaPath = fileURLToPath(new URL('../../../schema/recipe.schema.json', import.meta.url))
 const schema = JSON.parse(readFileSync(schemaPath, 'utf8')) as object

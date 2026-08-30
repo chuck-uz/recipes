@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatNumber, formatQuantity } from '../src/index.js'
+import { formatNumber, formatQuantity } from '../src/index'
 
 describe('дроби и числа', () => {
   it.each([

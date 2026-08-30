@@ -5,9 +5,9 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import type { IndexEntry, Recipe, RecipeIndex } from '../types.js'
-import { SUPPORTED_SCHEMA_VERSION } from '../types.js'
-import { indexPath, recipesDir } from './paths.js'
+import type { IndexEntry, Recipe, RecipeIndex } from '../types'
+import { SUPPORTED_SCHEMA_VERSION } from '../types'
+import { indexPath, recipesDir } from './paths'
 
 const dir = fileURLToPath(recipesDir)
 const files = readdirSync(dir).filter((f) => f.endsWith('.json')).sort()

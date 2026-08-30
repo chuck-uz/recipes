@@ -1,4 +1,4 @@
-import type { Unit } from './types.js'
+import type { Unit } from './types'
 
 const FRACTIONS: Record<string, string> = {
   '0.25': '¼',

@@ -1,0 +1,43 @@
+name: Приложение
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'packages/recipe-core/**'
+      - '.github/workflows/app.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'packages/recipe-core/**'
+  workflow_dispatch:
+
+concurrency:
+  group: app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - name: Типы
+        run: npx tsc --noEmit
+
+      # Metro должен собрать бандл целиком: это ловит и ошибки резолва
+      # recipe-core из-за границы корня приложения, и опечатки в роутах.
+      - name: Сборка бандла
+        run: npx expo export --platform android --output-dir /tmp/export

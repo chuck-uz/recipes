@@ -1,6 +1,6 @@
-import { formatQuantity, type FormatOptions } from './format.js'
-import { scaleIngredient } from './scale.js'
-import type { Ingredient, Recipe, Step } from './types.js'
+import { formatQuantity, type FormatOptions } from './format'
+import { scaleIngredient } from './scale'
+import type { Ingredient, Recipe, Step } from './types'
 
 export const PLACEHOLDER = /\{([a-zA-Z0-9_-]+)\}/g
 

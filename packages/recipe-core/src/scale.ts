@@ -1,4 +1,4 @@
-import type { Ingredient, Unit } from './types.js'
+import type { Ingredient, Unit } from './types'
 
 interface Rounding {
   /** шаг округления */

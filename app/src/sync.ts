@@ -17,7 +17,10 @@ const rawUrl = (settings: Settings, file: string) =>
   `https://raw.githubusercontent.com/${settings.repo}/${settings.branch}/${file}`
 
 async function fetchJson<T>(url: string, token: string | null, bustCache: boolean): Promise<T> {
-  const headers: Record<string, string> = { 'Cache-Control': 'no-cache' }
+  // Никаких лишних заголовков: любой нестандартный превращает запрос
+  // в предварительный (preflight), которого GitHub на raw не принимает.
+  // Свежесть обеспечивает параметр в адресе, а не заголовок.
+  const headers: Record<string, string> = {}
   if (token) headers.Authorization = `Bearer ${token}`
 
   // GitHub отдаёт содержимое через CDN с кешем в несколько минут. При ручном

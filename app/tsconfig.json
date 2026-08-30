@@ -2,21 +2,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@core": [
-        "../packages/recipe-core/src/client"
-      ]
-    }
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
     "../packages/recipe-core/src/client.ts",
     "../packages/recipe-core/src/types.ts",
     "../packages/recipe-core/src/format.ts",

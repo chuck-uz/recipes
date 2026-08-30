@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T11:47:35.468Z",
+  "generatedAt": "2026-08-30T13:18:58.128Z",
   "recipes": [
+    {
+      "id": "indejka-s-ovoshchami-v-duhovke",
+      "title": "Индейка с овощами в духовке",
+      "tags": [
+        "ужин",
+        "индейка",
+        "духовка"
+      ],
+      "totalTimeMin": 60,
+      "servings": 4,
+      "updatedAt": "2026-08-30",
+      "file": "recipes/indejka-s-ovoshchami-v-duhovke.json",
+      "sha256": "56e99b1ea577c14dee4aee99c967639002d613b52976ccc5ffe0bad1e1976c3d"
+    },
     {
       "id": "kurinyj-sup-dieticheskij",
       "title": "Лёгкий куриный суп с рисом",

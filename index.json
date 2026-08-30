@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30T11:47:35.468Z",
+  "recipes": [
+    {
+      "id": "kurinyj-sup-dieticheskij",
+      "title": "Лёгкий куриный суп с рисом",
+      "tags": [
+        "суп",
+        "диетическое",
+        "курица"
+      ],
+      "totalTimeMin": 70,
+      "servings": 4,
+      "updatedAt": "2026-08-30",
+      "file": "recipes/kurinyj-sup-dieticheskij.json",
+      "sha256": "a990fc3e5c1694c6a340115345f7e0083a9fa8ed6f8e1a7f65fbfee0a6138759"
+    }
+  ]
+}

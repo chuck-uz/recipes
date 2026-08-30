@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T13:18:58.128Z",
+  "generatedAt": "2026-08-30T13:27:21.581Z",
   "recipes": [
+    {
+      "id": "borshch-klassicheskiy",
+      "title": "Борщ классический",
+      "tags": [
+        "суп",
+        "говядина",
+        "обед"
+      ],
+      "totalTimeMin": 150,
+      "servings": 6,
+      "updatedAt": "2026-08-30",
+      "file": "recipes/borshch-klassicheskiy.json",
+      "sha256": "9f7a5c3e673c8aa786c04d7c591b536cfe94a82de2696f84b2f0f3c5ecdcd355"
+    },
     {
       "id": "indejka-s-ovoshchami-v-duhovke",
       "title": "Индейка с овощами в духовке",

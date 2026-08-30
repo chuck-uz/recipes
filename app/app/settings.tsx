@@ -5,6 +5,7 @@ import { useSettings } from '../src/settings-context'
 import * as storage from '../src/storage'
 import { AuthError, describeSync, OfflineError, sync } from '../src/sync'
 import { startTimer, TimersUnavailableError } from '../src/timers'
+import { checkForUpdate, downloadAndInstall } from '../src/update'
 import { sizes, usePalette, type Palette } from '../src/theme'
 
 const THEMES: Array<{ value: ThemeChoice; label: string }> = [
@@ -22,6 +23,7 @@ export default function SettingsScreen() {
   const [token, setToken] = useState('')
   const [lastSync, setLastSync] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [updateLabel, setUpdateLabel] = useState('Проверить обновления')
 
   useEffect(() => {
     void loadToken().then((stored) => setToken(stored ?? ''))
@@ -46,6 +48,42 @@ export default function SettingsScreen() {
       Alert.alert('Не получилось', message)
     } finally {
       setBusy(false)
+    }
+  }
+
+  // Проверка вручную отвечает и тогда, когда обновления нет: молчаливая
+  // кнопка неотличима от сломанной.
+  const checkUpdates = async () => {
+    setUpdateLabel('Проверяю…')
+    try {
+      const info = await checkForUpdate(settings.repo, true)
+      if (!info) {
+        setUpdateLabel('Проверить обновления')
+        Alert.alert('Обновления', `Установлена последняя версия — ${appVersion}.`)
+        return
+      }
+      Alert.alert(`Доступна версия ${info.version}`, 'Скачать и установить?', [
+        { text: 'Позже', style: 'cancel', onPress: () => setUpdateLabel('Проверить обновления') },
+        {
+          text: 'Обновить',
+          onPress: () => {
+            void (async () => {
+              try {
+                await downloadAndInstall(info, (fraction) =>
+                  setUpdateLabel(`Скачивание — ${Math.round(fraction * 100)}%`),
+                )
+              } catch (error) {
+                Alert.alert('Не получилось обновить', (error as Error).message)
+              } finally {
+                setUpdateLabel('Проверить обновления')
+              }
+            })()
+          },
+        },
+      ])
+    } catch (error) {
+      setUpdateLabel('Проверить обновления')
+      Alert.alert('Не получилось проверить', (error as Error).message)
     }
   }
 
@@ -151,6 +189,9 @@ export default function SettingsScreen() {
         <Text style={styles.blockTitle}>Обслуживание</Text>
         <Pressable style={styles.action} onPress={() => void syncNow()} disabled={busy}>
           <Text style={styles.actionText}>{busy ? 'Синхронизирую…' : 'Синхронизировать сейчас'}</Text>
+        </Pressable>
+        <Pressable style={styles.actionQuiet} onPress={() => void checkUpdates()}>
+          <Text style={styles.actionQuietText}>{updateLabel}</Text>
         </Pressable>
         <Pressable style={styles.actionQuiet} onPress={() => void testTimer()}>
           <Text style={styles.actionQuietText}>Проверить таймер (10 секунд)</Text>

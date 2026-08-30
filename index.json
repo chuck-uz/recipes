@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T13:29:11.413Z",
+  "generatedAt": "2026-08-30T21:16:27.082Z",
   "recipes": [
     {
       "id": "borshch-klassicheskiy",
@@ -15,20 +15,6 @@
       "updatedAt": "2026-08-30",
       "file": "recipes/borshch-klassicheskiy.json",
       "sha256": "75e1bb4c1db9ee87ea2c55bc81904371dfc5748a96dff6284235630d2e48e43e"
-    },
-    {
-      "id": "indejka-s-ovoshchami-v-duhovke",
-      "title": "Индейка с овощами в духовке",
-      "tags": [
-        "ужин",
-        "индейка",
-        "духовка"
-      ],
-      "totalTimeMin": 60,
-      "servings": 4,
-      "updatedAt": "2026-08-30",
-      "file": "recipes/indejka-s-ovoshchami-v-duhovke.json",
-      "sha256": "56e99b1ea577c14dee4aee99c967639002d613b52976ccc5ffe0bad1e1976c3d"
     },
     {
       "id": "kurinyj-sup-dieticheskij",

@@ -56,11 +56,11 @@ export default function SettingsScreen() {
       await startTimer(10, 'Проверка')
       Alert.alert('Таймер заведён', 'Через десять секунд должны зазвонить «Часы».')
     } catch (error) {
+      // Показываем настоящую причину: без неё «не запустился» невозможно
+      // отличить от «нет разрешения» и починить с одного захода.
       Alert.alert(
         'Таймер не запустился',
-        error instanceof TimersUnavailableError
-          ? 'Приложение «Часы» не приняло интент. В режиме готовки останется ручной запуск.'
-          : (error as Error).message,
+        `Приложение «Часы» не приняло интент.\n\n${(error as Error).message}`,
       )
     }
   }

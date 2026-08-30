@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as IntentLauncher from 'expo-intent-launcher'
-import { Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 
 /**
  * Таймеры ведёт системное приложение «Часы»: мы лишь заводим их стандартным
@@ -25,38 +25,65 @@ export interface ActiveTimer {
 export class TimersUnavailableError extends Error {}
 
 /**
- * Заводит таймер, не покидая рецепт. Если прошивка не умеет тихий запуск,
- * пробуем ещё раз с открытием «Часов» — лучше переключить экран, чем промолчать.
+ * Способов отправить интент два, и они отличаются типами дополнительных полей.
+ * Linking.sendIntent кладёт длительность целым числом — именно этого ждут «Часы»;
+ * IntentLauncher оставлен запасным на случай, если первый способ не сработает.
+ */
+async function viaLinking(seconds: number, label: string, skipUi: boolean): Promise<void> {
+  await Linking.sendIntent(SET_TIMER, [
+    { key: EXTRA_LENGTH, value: Math.round(seconds) },
+    { key: EXTRA_MESSAGE, value: label },
+    { key: EXTRA_SKIP_UI, value: skipUi },
+  ])
+}
+
+async function viaIntentLauncher(seconds: number, label: string, skipUi: boolean): Promise<void> {
+  await IntentLauncher.startActivityAsync(SET_TIMER, {
+    extra: {
+      [EXTRA_LENGTH]: Math.round(seconds),
+      [EXTRA_MESSAGE]: label,
+      [EXTRA_SKIP_UI]: skipUi,
+    },
+  })
+}
+
+/**
+ * Заводит таймер, не покидая рецепт. Если тихий запуск не проходит, пробуем
+ * с открытием «Часов»: лучше переключить экран, чем промолчать.
+ *
+ * При полной неудаче сообщение содержит причины всех попыток — иначе
+ * «не запустился» невозможно отличить от «нет разрешения».
  */
 export async function startTimer(seconds: number, label: string): Promise<ActiveTimer> {
   if (Platform.OS !== 'android') {
     throw new TimersUnavailableError('системный таймер доступен только на Android')
   }
 
-  const extra: Record<string, string | number | boolean> = {
-    [EXTRA_LENGTH]: Math.round(seconds),
-    [EXTRA_MESSAGE]: label,
-    [EXTRA_SKIP_UI]: true,
-  }
+  const attempts: Array<[string, () => Promise<void>]> = [
+    ['тихий запуск', () => viaLinking(seconds, label, true)],
+    ['с открытием «Часов»', () => viaLinking(seconds, label, false)],
+    ['запасной способ, тихо', () => viaIntentLauncher(seconds, label, true)],
+    ['запасной способ, с открытием', () => viaIntentLauncher(seconds, label, false)],
+  ]
 
-  try {
-    await IntentLauncher.startActivityAsync(SET_TIMER, { extra })
-  } catch {
+  const failures: string[] = []
+
+  for (const [name, attempt] of attempts) {
     try {
-      await IntentLauncher.startActivityAsync(SET_TIMER, { extra: { ...extra, [EXTRA_SKIP_UI]: false } })
-    } catch {
-      throw new TimersUnavailableError('приложение «Часы» не приняло таймер')
+      await attempt()
+      const timer: ActiveTimer = {
+        key: `${Date.now()}-${Math.round(seconds)}`,
+        label,
+        endsAt: Date.now() + Math.round(seconds) * 1000,
+      }
+      await saveTimers([...(await loadTimers()), timer])
+      return timer
+    } catch (error) {
+      failures.push(`${name}: ${(error as Error).message}`)
     }
   }
 
-  const timer: ActiveTimer = {
-    key: `${Date.now()}-${Math.round(seconds)}`,
-    label,
-    endsAt: Date.now() + Math.round(seconds) * 1000,
-  }
-
-  await saveTimers([...(await loadTimers()), timer])
-  return timer
+  throw new TimersUnavailableError(failures.join('\n'))
 }
 
 export async function openClock(): Promise<void> {

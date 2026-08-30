@@ -3,25 +3,29 @@
     "name": "Рецепты",
     "slug": "recipes",
     "scheme": "recipes",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "android": {
       "package": "uz.chuck.recipes",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "com.android.alarm.permission.SET_ALARM"
+      ]
     },
     "plugins": [
       "expo-router",
-      "./plugins/with-release-signing"
+      "./plugins/with-release-signing",
+      "./plugins/with-alarm-queries"
     ],
     "extra": {
       "defaultRepo": "chuck-uz/recipes",

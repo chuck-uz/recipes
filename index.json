@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30T13:27:21.581Z",
+  "generatedAt": "2026-08-30T13:29:11.413Z",
   "recipes": [
     {
       "id": "borshch-klassicheskiy",
@@ -14,7 +14,7 @@
       "servings": 6,
       "updatedAt": "2026-08-30",
       "file": "recipes/borshch-klassicheskiy.json",
-      "sha256": "9f7a5c3e673c8aa786c04d7c591b536cfe94a82de2696f84b2f0f3c5ecdcd355"
+      "sha256": "75e1bb4c1db9ee87ea2c55bc81904371dfc5748a96dff6284235630d2e48e43e"
     },
     {
       "id": "indejka-s-ovoshchami-v-duhovke",
@@ -42,7 +42,7 @@
       "servings": 4,
       "updatedAt": "2026-08-30",
       "file": "recipes/kurinyj-sup-dieticheskij.json",
-      "sha256": "a990fc3e5c1694c6a340115345f7e0083a9fa8ed6f8e1a7f65fbfee0a6138759"
+      "sha256": "cf1e038a665fb02d08d48627ffe6f6d5695758f8fffc20fc555f9219dffdb971"
     }
   ]
 }

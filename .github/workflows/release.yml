@@ -1,0 +1,84 @@
+name: Релиз
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Версия в app.json должна совпадать с тегом
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION="$(node -p "require('./app/app.json').expo.version")"
+          if [[ "$TAG" != "$VERSION" ]]; then
+            echo "Тег $GITHUB_REF_NAME не совпадает с версией $VERSION в app/app.json"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Зависимости
+        working-directory: app
+        run: npm ci
+
+      # Ключ живёт только в памяти раннера и в секретах репозитория.
+      - name: Ключ подписи
+        run: echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.keystore"
+
+      - name: Нативный проект
+        working-directory: app
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Сборка APK
+        working-directory: app/android
+        run: |
+          ./gradlew assembleRelease \
+            -PRECIPES_STORE_FILE="$RUNNER_TEMP/release.keystore" \
+            -PRECIPES_STORE_PASSWORD="${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" \
+            -PRECIPES_KEY_ALIAS=recipes \
+            -PRECIPES_KEY_PASSWORD="${{ secrets.RELEASE_KEYSTORE_PASSWORD }}"
+
+      # Без этой проверки можно годами публиковать APK, подписанный
+      # отладочным ключом, и заметить это только при первом обновлении.
+      - name: Проверка подписи
+        run: |
+          BUILD_TOOLS="$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+          APK=app/android/app/build/outputs/apk/release/app-release.apk
+          "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/certs.txt
+          if grep -qi "CN=Android Debug" /tmp/certs.txt; then
+            echo "APK подписан отладочным ключом — релиз недопустим"
+            exit 1
+          fi
+
+      - name: Публикация
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK="recipes-$version.apk"
+          cp app/android/app/build/outputs/apk/release/app-release.apk "$APK"
+          gh release create "$GITHUB_REF_NAME" "$APK" \
+            --title "Рецепты $version" \
+            --generate-notes

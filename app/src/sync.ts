@@ -16,16 +16,18 @@ export class AuthError extends Error {}
 const rawUrl = (settings: Settings, file: string) =>
   `https://raw.githubusercontent.com/${settings.repo}/${settings.branch}/${file}`
 
-async function fetchJson<T>(url: string, token: string | null, bustCache: boolean): Promise<T> {
+async function fetchJson<T>(url: string, token: string | null): Promise<T> {
   // Никаких лишних заголовков: любой нестандартный превращает запрос
   // в предварительный (preflight), которого GitHub на raw не принимает.
   // Свежесть обеспечивает параметр в адресе, а не заголовок.
   const headers: Record<string, string> = {}
   if (token) headers.Authorization = `Bearer ${token}`
 
-  // GitHub отдаёт содержимое через CDN с кешем в несколько минут. При ручном
-  // обновлении добавляем уникальный параметр, чтобы свайп вниз показывал свежее.
-  const target = bustCache ? `${url}?t=${Date.now()}` : url
+  // GitHub отдаёт содержимое через CDN и держит его в кеше дольше, чем обещает.
+  // Без уникального параметра приложение получает вчерашний индекс и честно
+  // сообщает «Всё актуально» — худший вид ошибки, потому что он выглядит успехом.
+  // Файлы крошечные, поэтому обходим кеш всегда, а не только при ручном свайпе.
+  const target = `${url}?t=${Date.now()}`
 
   let response: Response
   try {
@@ -58,9 +60,9 @@ async function inBatches<T, R>(items: T[], size: number, fn: (item: T) => Promis
  * index.json сохраняется последним: если загрузка оборвётся на середине,
  * следующая синхронизация просто доделает работу.
  */
-export async function sync(settings: Settings, bustCache = false): Promise<SyncResult> {
+export async function sync(settings: Settings): Promise<SyncResult> {
   const token = await loadToken()
-  const remote = await fetchJson<RecipeIndex>(rawUrl(settings, 'index.json'), token, bustCache)
+  const remote = await fetchJson<RecipeIndex>(rawUrl(settings, 'index.json'), token)
 
   const local = await storage.getIndex()
   const localById = new Map((local?.recipes ?? []).map((entry) => [entry.id, entry]))
@@ -74,7 +76,7 @@ export async function sync(settings: Settings, bustCache = false): Promise<SyncR
   const toDownload = stale.filter((entry): entry is NonNullable<typeof entry> => entry !== null)
 
   await inBatches(toDownload, 6, async (entry) => {
-    const recipe = await fetchJson<Recipe>(rawUrl(settings, entry.file), token, bustCache)
+    const recipe = await fetchJson<Recipe>(rawUrl(settings, entry.file), token)
     await storage.setRecipe(recipe)
   })
 

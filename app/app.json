@@ -3,14 +3,14 @@
     "name": "Рецепты",
     "slug": "recipes",
     "scheme": "recipes",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "android": {
       "package": "uz.chuck.recipes",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

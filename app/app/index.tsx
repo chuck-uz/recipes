@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -31,6 +31,10 @@ export default function RecipeList() {
   const [message, setMessage] = useState<string | null>(null)
   const [update, setUpdate] = useState<string | null>(null)
 
+  // Две синхронизации разом затирают итог друг друга: свайп вниз во время
+  // стартовой показал бы «Всё актуально» поверх «новых: 1».
+  const syncing = useRef(false)
+
   const readLocal = useCallback(async () => {
     const [index, freshIds, archivedIds] = await Promise.all([
       storage.getIndex(),
@@ -43,10 +47,12 @@ export default function RecipeList() {
   }, [])
 
   const runSync = useCallback(
-    async (manual: boolean) => {
+    async () => {
+      if (syncing.current) return
+      syncing.current = true
       setBusy(true)
       try {
-        const result = await sync(settings, manual)
+        const result = await sync(settings)
         setMessage(describeSync(result))
       } catch (error) {
         if (error instanceof OfflineError) setMessage('Нет сети — показаны сохранённые')
@@ -55,6 +61,7 @@ export default function RecipeList() {
       } finally {
         await readLocal()
         setBusy(false)
+        syncing.current = false
       }
     },
     [settings, readLocal],
@@ -62,7 +69,7 @@ export default function RecipeList() {
 
   useEffect(() => {
     if (!ready) return
-    void readLocal().then(() => runSync(false))
+    void readLocal().then(() => runSync())
     void checkForUpdate(settings.repo).then(setUpdate)
     // намеренно только при готовности настроек: синхронизация при запуске
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,7 +99,7 @@ export default function RecipeList() {
       keyExtractor={(entry) => entry.id}
       contentContainerStyle={{ padding: sizes.pad, gap: sizes.gap, paddingBottom: 40 }}
       refreshControl={
-        <RefreshControl refreshing={busy} onRefresh={() => runSync(true)} tintColor={palette.accent} />
+        <RefreshControl refreshing={busy} onRefresh={() => void runSync()} tintColor={palette.accent} />
       }
       ListHeaderComponent={
         <View style={{ gap: sizes.gap, marginBottom: sizes.gap }}>

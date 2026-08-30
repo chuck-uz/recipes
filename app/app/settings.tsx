@@ -33,7 +33,7 @@ export default function SettingsScreen() {
   const syncNow = async () => {
     setBusy(true)
     try {
-      const result = await sync({ ...settings, repo, branch }, true)
+      const result = await sync({ ...settings, repo, branch })
       setLastSync(await storage.getLastSync())
       Alert.alert('Синхронизация', describeSync(result))
     } catch (error) {

@@ -1,21 +1,65 @@
 {
   "schemaVersion": 1,
   "id": "kurinyj-sup-dieticheskij",
-  "version": 1,
+  "version": 2,
   "title": "Лёгкий куриный суп с рисом",
   "description": "Суп на втором бульоне, без зажарки и острых специй.",
-  "tags": ["суп", "диетическое", "курица"],
+  "tags": [
+    "суп",
+    "диетическое",
+    "курица"
+  ],
   "servings": 4,
   "totalTimeMin": 70,
   "ingredients": [
-    { "id": "chicken", "name": "куриная грудка без кожи и костей", "amount": 500, "unit": "g" },
-    { "id": "water", "name": "вода для бульона", "amount": 2, "unit": "l", "scalable": false },
-    { "id": "potato", "name": "картофель средний", "amount": 3, "unit": "pcs" },
-    { "id": "carrot", "name": "морковь средняя", "amount": 1, "unit": "pcs" },
-    { "id": "rice", "name": "рис круглозёрный", "amount": 60, "unit": "g" },
-    { "id": "bayleaf", "name": "лавровый лист", "amount": 1, "unit": "pcs", "scalable": false },
-    { "id": "salt", "name": "соль", "amount": 1, "unit": "tsp" },
-    { "id": "dill", "name": "укроп свежий", "unit": "to_taste" }
+    {
+      "id": "chicken",
+      "name": "куриная грудка без кожи и костей",
+      "amount": 500,
+      "unit": "g"
+    },
+    {
+      "id": "water",
+      "name": "вода для бульона",
+      "amount": 2,
+      "unit": "l"
+    },
+    {
+      "id": "potato",
+      "name": "картофель средний",
+      "amount": 3,
+      "unit": "pcs"
+    },
+    {
+      "id": "carrot",
+      "name": "морковь средняя",
+      "amount": 1,
+      "unit": "pcs"
+    },
+    {
+      "id": "rice",
+      "name": "рис круглозёрный",
+      "amount": 60,
+      "unit": "g"
+    },
+    {
+      "id": "bayleaf",
+      "name": "лавровый лист",
+      "amount": 1,
+      "unit": "pcs",
+      "scalable": false
+    },
+    {
+      "id": "salt",
+      "name": "соль",
+      "amount": 1,
+      "unit": "tsp"
+    },
+    {
+      "id": "dill",
+      "name": "укроп свежий",
+      "unit": "to_taste"
+    }
   ],
   "steps": [
     {

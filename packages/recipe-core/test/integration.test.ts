@@ -38,17 +38,24 @@ describe('куриный суп на разном числе порций', () =
     expect(shown(soup, 8, 'salt')).toBe('2 чайные ложки')
   })
 
-  it('вода и лавровый лист не растут ни на каком числе порций', () => {
+  it('лавровый лист не растёт ни на каком числе порций', () => {
     for (const servings of [1, 2, 6, 8, 12]) {
-      expect(shown(soup, servings, 'water')).toBe('2 л')
       expect(shown(soup, servings, 'bayleaf')).toBe('1 шт.')
     }
+  })
+
+  // Бульон — это само блюдо, а не среда для отваривания: вдвое больше супа
+  // требует вдвое больше воды.
+  it('бульон растёт вместе с порциями', () => {
+    expect(shown(soup, 2, 'water')).toBe('1 л')
+    expect(shown(soup, 4, 'water')).toBe('2 л')
+    expect(shown(soup, 8, 'water')).toBe('4 л')
   })
 
   it('количества подставляются в текст шагов', () => {
     const rendered = renderRecipe(soup, 8)
     expect(rendered.steps[0]?.text).toContain('куриную грудку (1 кг)')
-    expect(rendered.steps[1]?.text).toContain('свежей водой (2 л)')
+    expect(rendered.steps[1]?.text).toContain('свежей водой (4 л)')
     expect(rendered.steps[4]?.text).toContain('посолите (2 чайные ложки)')
   })
 

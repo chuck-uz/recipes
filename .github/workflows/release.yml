@@ -54,7 +54,10 @@ jobs:
       - name: Сборка APK
         working-directory: app/android
         run: |
+          # Только arm64-v8a: универсальный APK тащит ещё три архитектуры,
+          # которых нет ни в одном современном телефоне, и весит втрое больше.
           ./gradlew assembleRelease \
+            -PreactNativeArchitectures=arm64-v8a \
             -PRECIPES_STORE_FILE="$RUNNER_TEMP/release.keystore" \
             -PRECIPES_STORE_PASSWORD="${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" \
             -PRECIPES_KEY_ALIAS=recipes \

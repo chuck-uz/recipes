@@ -38,9 +38,6 @@ jobs:
 
       - run: npm ci
 
-      - name: Тесты recipe-core
-        run: npm test
-
       - name: Типы
         run: npx tsc --noEmit
 
@@ -52,9 +49,14 @@ jobs:
           # только обезличенные медицинские термины.
           RECIPES_STOPWORDS: ${{ secrets.RECIPES_STOPWORDS }}
 
+      # Индекс собирается до тестов, в том числе на pull request. Иначе
+      # контрактный тест сверяет свежие рецепты с прошлым индексом, падает,
+      # и до пересборки индекса дело не доходит вообще никогда.
       - name: Сборка индекса
-        if: github.event_name != 'pull_request'
         run: npm run content:index
+
+      - name: Тесты recipe-core
+        run: npm test
 
       - name: Коммит индекса
         if: github.event_name != 'pull_request'

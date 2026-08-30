@@ -2,7 +2,10 @@ import { useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ActivityIndicator,
+  Alert,
+  AppState,
   FlatList,
+  Linking,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -15,7 +18,7 @@ import { useSettings } from '../src/settings-context'
 import * as storage from '../src/storage'
 import { AuthError, describeSync, OfflineError, sync } from '../src/sync'
 import { sizes, usePalette, type Palette } from '../src/theme'
-import { checkForUpdate } from '../src/update'
+import { checkForUpdate, downloadAndInstall, type UpdateInfo } from '../src/update'
 
 export default function RecipeList() {
   const { settings, ready } = useSettings()
@@ -29,7 +32,9 @@ export default function RecipeList() {
   const [activeTags, setActiveTags] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const [update, setUpdate] = useState<string | null>(null)
+  const [update, setUpdate] = useState<UpdateInfo | null>(null)
+  const [installing, setInstalling] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   // Две синхронизации разом затирают итог друг друга: свайп вниз во время
   // стартовой показал бы «Всё актуально» поверх «новых: 1».
@@ -70,10 +75,36 @@ export default function RecipeList() {
   useEffect(() => {
     if (!ready) return
     void readLocal().then(() => runSync())
-    void checkForUpdate(settings.repo).then(setUpdate)
+    void checkForUpdate(settings.repo).then(setUpdate).catch(() => undefined)
     // намеренно только при готовности настроек: синхронизация при запуске
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
+
+  // Приложение может неделями висеть в фоне: без проверки при возврате
+  // плашку обновления можно не увидеть до следующего холодного старта.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return
+      void checkForUpdate(settings.repo).then(setUpdate).catch(() => undefined)
+    })
+    return () => subscription.remove()
+  }, [settings.repo])
+
+  const install = useCallback(async () => {
+    if (!update || installing) return
+    setInstalling(true)
+    setProgress(0)
+    try {
+      await downloadAndInstall(update, setProgress)
+    } catch (error) {
+      Alert.alert('Не получилось обновить', (error as Error).message, [
+        { text: 'Закрыть', style: 'cancel' },
+        { text: 'Открыть в браузере', onPress: () => void Linking.openURL(update.pageUrl) },
+      ])
+    } finally {
+      setInstalling(false)
+    }
+  }, [update, installing])
 
   useFocusEffect(
     useCallback(() => {
@@ -104,11 +135,22 @@ export default function RecipeList() {
       ListHeaderComponent={
         <View style={{ gap: sizes.gap, marginBottom: sizes.gap }}>
           {update && (
-            <View style={styles.banner}>
+            <Pressable
+              style={styles.banner}
+              onPress={() => void install()}
+              disabled={installing}
+            >
               <Text style={styles.bannerText}>
-                Доступна версия {update} — скачайте APK из релизов на GitHub
+                {installing
+                  ? `Скачивание версии ${update.version} — ${Math.round(progress * 100)}%`
+                  : `Доступна версия ${update.version} — нажмите, чтобы обновить`}
               </Text>
-            </View>
+              {installing && (
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
+                </View>
+              )}
+            </Pressable>
           )}
 
           <TextInput
@@ -222,6 +264,16 @@ const makeStyles = (palette: Palette) =>
       backgroundColor: palette.accent,
       borderRadius: sizes.radius,
       padding: sizes.pad,
+      minHeight: sizes.tap,
+      justifyContent: 'center',
     },
     bannerText: { color: palette.accentText, fontSize: sizes.small, fontWeight: '600' },
+    progressTrack: {
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: 'rgba(255,255,255,0.35)',
+      marginTop: 10,
+      overflow: 'hidden',
+    },
+    progressFill: { height: 6, backgroundColor: palette.accentText },
   })

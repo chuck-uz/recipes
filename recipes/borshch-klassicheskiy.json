@@ -1,30 +1,118 @@
 {
   "schemaVersion": 1,
   "id": "borshch-klassicheskiy",
-  "version": 1,
+  "version": 2,
   "title": "Борщ классический",
   "description": "Наваристый борщ на говяжьем бульоне с ярким свекольным цветом.",
-  "tags": ["суп", "говядина", "обед"],
+  "tags": [
+    "суп",
+    "говядина",
+    "обед"
+  ],
   "servings": 6,
   "totalTimeMin": 150,
   "ingredients": [
-    { "id": "beef", "name": "говядина на кости, грудинка или голяшка", "amount": 500, "unit": "g" },
-    { "id": "water", "name": "вода для бульона", "amount": 2.5, "unit": "l", "scalable": false },
-    { "id": "beet", "name": "свёкла средняя", "amount": 2, "unit": "pcs" },
-    { "id": "potato", "name": "картофель средний", "amount": 4, "unit": "pcs" },
-    { "id": "cabbage", "name": "капуста белокочанная", "amount": 300, "unit": "g" },
-    { "id": "carrot", "name": "морковь крупная", "amount": 1, "unit": "pcs" },
-    { "id": "onion", "name": "лук репчатый", "amount": 1, "unit": "pcs" },
-    { "id": "tomato_paste", "name": "томатная паста", "amount": 2, "unit": "tbsp" },
-    { "id": "oil", "name": "масло растительное", "amount": 3, "unit": "tbsp", "scalable": false },
-    { "id": "vinegar", "name": "уксус 9 процентов", "amount": 1, "unit": "tbsp" },
-    { "id": "sugar", "name": "сахар", "amount": 1, "unit": "tsp" },
-    { "id": "bayleaf", "name": "лавровый лист", "amount": 2, "unit": "pcs", "scalable": false },
-    { "id": "garlic", "name": "зубчик чеснока", "amount": 3, "unit": "pcs" },
-    { "id": "sour_cream", "name": "сметана для подачи", "amount": 200, "unit": "g" },
-    { "id": "salt", "name": "соль", "unit": "to_taste" },
-    { "id": "pepper", "name": "перец чёрный молотый", "unit": "to_taste" },
-    { "id": "greens", "name": "зелень свежая", "unit": "to_taste" }
+    {
+      "id": "beef",
+      "name": "говядина на кости, грудинка или голяшка",
+      "amount": 500,
+      "unit": "g"
+    },
+    {
+      "id": "water",
+      "name": "вода для бульона",
+      "amount": 2.5,
+      "unit": "l"
+    },
+    {
+      "id": "beet",
+      "name": "свёкла средняя",
+      "amount": 2,
+      "unit": "pcs"
+    },
+    {
+      "id": "potato",
+      "name": "картофель средний",
+      "amount": 4,
+      "unit": "pcs"
+    },
+    {
+      "id": "cabbage",
+      "name": "капуста белокочанная",
+      "amount": 300,
+      "unit": "g"
+    },
+    {
+      "id": "carrot",
+      "name": "морковь крупная",
+      "amount": 1,
+      "unit": "pcs"
+    },
+    {
+      "id": "onion",
+      "name": "лук репчатый",
+      "amount": 1,
+      "unit": "pcs"
+    },
+    {
+      "id": "tomato_paste",
+      "name": "томатная паста",
+      "amount": 2,
+      "unit": "tbsp"
+    },
+    {
+      "id": "oil",
+      "name": "масло растительное",
+      "amount": 3,
+      "unit": "tbsp",
+      "scalable": false
+    },
+    {
+      "id": "vinegar",
+      "name": "уксус 9 процентов",
+      "amount": 1,
+      "unit": "tbsp"
+    },
+    {
+      "id": "sugar",
+      "name": "сахар",
+      "amount": 1,
+      "unit": "tsp"
+    },
+    {
+      "id": "bayleaf",
+      "name": "лавровый лист",
+      "amount": 2,
+      "unit": "pcs",
+      "scalable": false
+    },
+    {
+      "id": "garlic",
+      "name": "зубчик чеснока",
+      "amount": 3,
+      "unit": "pcs"
+    },
+    {
+      "id": "sour_cream",
+      "name": "сметана для подачи",
+      "amount": 200,
+      "unit": "g"
+    },
+    {
+      "id": "salt",
+      "name": "соль",
+      "unit": "to_taste"
+    },
+    {
+      "id": "pepper",
+      "name": "перец чёрный молотый",
+      "unit": "to_taste"
+    },
+    {
+      "id": "greens",
+      "name": "зелень свежая",
+      "unit": "to_taste"
+    }
   ],
   "steps": [
     {

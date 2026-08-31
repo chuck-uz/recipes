@@ -128,7 +128,9 @@ export default function SettingsScreen() {
           style={styles.input}
         />
         <Text style={styles.hint}>
-          Токен нужен только приватному репозиторию. Хранится в защищённом хранилище устройства.
+          Токен нужен, чтобы удалять рецепты из приложения, и для приватного репозитория.
+          Достаточно fine-grained токена с правом Contents: Read and write на этот репозиторий.
+          Хранится в защищённом хранилище устройства, в репозиторий не попадает никогда.
         </Text>
         <TextInput
           value={token}
@@ -137,7 +139,7 @@ export default function SettingsScreen() {
           autoCapitalize="none"
           autoCorrect={false}
           secureTextEntry
-          placeholder="токен только на чтение"
+          placeholder="токен GitHub"
           placeholderTextColor={palette.muted}
           style={styles.input}
         />

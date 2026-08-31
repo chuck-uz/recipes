@@ -82,9 +82,13 @@ export async function sync(settings: Settings): Promise<SyncResult> {
 
   const remoteIds = new Set(remote.recipes.map((entry) => entry.id))
   const removed = [...localById.keys()].filter((id) => !remoteIds.has(id))
-  if (removed.length > 0) {
-    const archived = await storage.getArchived()
-    await storage.setArchived([...new Set([...archived, ...removed])])
+
+  // Из архива нужно и выбывать: вернувшийся в репозиторий рецепт иначе
+  // остался бы скрытым навсегда.
+  const archived = await storage.getArchived()
+  const nextArchived = [...new Set([...archived.filter((id) => !remoteIds.has(id)), ...removed])]
+  if (nextArchived.join() !== archived.join()) {
+    await storage.setArchived(nextArchived)
   }
 
   const added = toDownload.filter((entry) => !localById.has(entry.id)).map((entry) => entry.id)

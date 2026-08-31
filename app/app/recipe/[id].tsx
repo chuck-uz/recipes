@@ -1,7 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { renderRecipe, type Recipe } from '../../src/core'
+import { deleteRecipeFile, NoTokenError, WriteForbiddenError } from '../../src/github'
 import { useSettings } from '../../src/settings-context'
 import * as storage from '../../src/storage'
 import { sizes, usePalette, type Palette } from '../../src/theme'
@@ -19,6 +20,7 @@ export default function RecipeCard() {
   const [servings, setServings] = useState(4)
   const [checked, setChecked] = useState<string[]>([])
   const [missing, setMissing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -62,6 +64,43 @@ export default function RecipeCard() {
       : [...checked, ingredientId]
     setChecked(next)
     persist({ checked: next })
+  }
+
+  /**
+   * Удаляет файл из репозитория. Локально прячем сразу, не дожидаясь CI:
+   * индекс пересоберётся через минуту, и синхронизация подтвердит удаление.
+   */
+  const remove = async () => {
+    if (!recipe || deleting) return
+    setDeleting(true)
+    try {
+      await deleteRecipeFile(settings, `recipes/${recipe.id}.json`, recipe.title)
+      await storage.setArchived([...(await storage.getArchived()), recipe.id])
+      await storage.clearSession(recipe.id)
+      router.back()
+    } catch (error) {
+      const message =
+        error instanceof NoTokenError
+          ? 'В настройках нет токена GitHub. Нужен токен с правом записи в репозиторий.'
+          : error instanceof WriteForbiddenError
+            ? `${(error as Error).message}. Проверьте права токена в настройках.`
+            : (error as Error).message
+      Alert.alert('Не получилось удалить', message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const confirmRemove = () => {
+    if (!recipe) return
+    Alert.alert(
+      'Удалить рецепт?',
+      `«${recipe.title}» исчезнет из репозитория и со всех устройств. Историю правок git сохранит, но в приложении рецепта не будет.`,
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Удалить', style: 'destructive', onPress: () => void remove() },
+      ],
+    )
   }
 
   const styles = makeStyles(palette)
@@ -145,6 +184,14 @@ export default function RecipeCard() {
       >
         <Text style={styles.cookText}>Готовить</Text>
       </Pressable>
+
+      <Pressable style={styles.remove} onPress={confirmRemove} disabled={deleting}>
+        {deleting ? (
+          <ActivityIndicator color={palette.danger} />
+        ) : (
+          <Text style={styles.removeText}>Удалить рецепт</Text>
+        )}
+      </Pressable>
     </ScrollView>
   )
 }
@@ -214,4 +261,11 @@ const makeStyles = (palette: Palette) =>
       justifyContent: 'center',
     },
     cookText: { color: palette.accentText, fontSize: 20, fontWeight: '700' },
+    remove: {
+      minHeight: sizes.tap,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 4,
+    },
+    removeText: { color: palette.danger, fontSize: sizes.body },
   })

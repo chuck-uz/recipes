@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as IntentLauncher from 'expo-intent-launcher'
-import { Linking, Platform } from 'react-native'
+import { Platform } from 'react-native'
 
 /**
  * Таймеры ведёт системное приложение «Часы»: мы лишь заводим их стандартным
@@ -25,19 +25,15 @@ export interface ActiveTimer {
 export class TimersUnavailableError extends Error {}
 
 /**
- * Способов отправить интент два, и они отличаются типами дополнительных полей.
- * Linking.sendIntent кладёт длительность целым числом — именно этого ждут «Часы»;
- * IntentLauncher оставлен запасным на случай, если первый способ не сработает.
+ * Длительность обязана уехать целым числом: «Часы» читают её через
+ * getIntExtra и, не найдя целого, заводят таймер по умолчанию — на минуту.
+ *
+ * Поэтому здесь именно expo-intent-launcher: он приводит числа из JavaScript
+ * к Int. Linking.sendIntent из React Native этого не делает — кладёт любое
+ * число дробным (см. IntentModule.kt: «We cannot know from JS if is an
+ * Integer or Double»), и таймер получается неправильным без единой ошибки.
  */
-async function viaLinking(seconds: number, label: string, skipUi: boolean): Promise<void> {
-  await Linking.sendIntent(SET_TIMER, [
-    { key: EXTRA_LENGTH, value: Math.round(seconds) },
-    { key: EXTRA_MESSAGE, value: label },
-    { key: EXTRA_SKIP_UI, value: skipUi },
-  ])
-}
-
-async function viaIntentLauncher(seconds: number, label: string, skipUi: boolean): Promise<void> {
+async function sendTimerIntent(seconds: number, label: string, skipUi: boolean): Promise<void> {
   await IntentLauncher.startActivityAsync(SET_TIMER, {
     extra: {
       [EXTRA_LENGTH]: Math.round(seconds),
@@ -60,10 +56,8 @@ export async function startTimer(seconds: number, label: string): Promise<Active
   }
 
   const attempts: Array<[string, () => Promise<void>]> = [
-    ['тихий запуск', () => viaLinking(seconds, label, true)],
-    ['с открытием «Часов»', () => viaLinking(seconds, label, false)],
-    ['запасной способ, тихо', () => viaIntentLauncher(seconds, label, true)],
-    ['запасной способ, с открытием', () => viaIntentLauncher(seconds, label, false)],
+    ['тихий запуск', () => sendTimerIntent(seconds, label, true)],
+    ['с открытием «Часов»', () => sendTimerIntent(seconds, label, false)],
   ]
 
   const failures: string[] = []

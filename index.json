@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T07:37:19.796Z",
+  "generatedAt": "2026-09-11T16:05:40.573Z",
   "recipes": [
     {
       "id": "borshch-klassicheskiy",
@@ -15,6 +15,21 @@
       "updatedAt": "2026-08-30",
       "file": "recipes/borshch-klassicheskiy.json",
       "sha256": "75e1bb4c1db9ee87ea2c55bc81904371dfc5748a96dff6284235630d2e48e43e"
+    },
+    {
+      "id": "chicken-thighs-honey-soy-airfryer",
+      "title": "Куриные бедра в медово-соевой глазури",
+      "tags": [
+        "курица",
+        "аэрогриль",
+        "ужин",
+        "маринад"
+      ],
+      "totalTimeMin": 190,
+      "servings": 3,
+      "updatedAt": "2026-09-11",
+      "file": "recipes/chicken-thighs-honey-soy-airfryer.json",
+      "sha256": "d31e736dda739cb4b62a4c280b8e1351175c3f076ccb2f3e78d25f786a7d814d"
     },
     {
       "id": "grechka-s-myasom",
